@@ -1,24 +1,51 @@
 import React, { useState, useEffect } from "react";
-import Image from "../banner.jpg";
 import axios from "axios";
 import { TailSpin } from "react-loader-spinner";
+import Pagination from "./Pagination";
 
 function Movies() {
   const [movies, setMovies] = useState([]);
+  const [page, setPage] = useState(1);
+  const [hover, setHover] = useState("");
+  const [favs, setFavs] = useState([]);
 
   useEffect(() => {
     axios
       .get(
-        "https://api.themoviedb.org/3/trending/movie/week?api_key=97310bb852aa576566d673aa9cfd45bf"
+        `https://api.themoviedb.org/3/trending/movie/day?api_key=97310bb852aa576566d673aa9cfd45bf&page=${page}`
       )
       .then((response) => {
-        console.log(response);
+        console.log(response.data.results);
         setMovies(response.data.results);
       })
       .catch((err) => {
         console.log(err);
       });
-  });
+  }, [page]);
+
+  const nextPage = () => {
+    setPage(page + 1);
+  };
+
+  const prevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
+  const addToFavs = (movie) => {
+    console.log("In addToFavs");
+    let newFavs = [...favs, movie];
+    setFavs([...newFavs]);
+    console.log(newFavs);
+  };
+
+  const removeFromFavs = (movie) => {
+    console.log("in removeFromFavs");
+    let newFavs = favs.filter((m) => m.id !== movie.id);
+    setFavs([...newFavs]);
+    console.log(newFavs);
+  };
 
   return (
     <>
@@ -49,9 +76,40 @@ function Movies() {
                   m-4
                   hover:scale-110
                   ease-out duration-300
+                  relative
                 `}
+                onMouseEnter={() => {
+                  setHover(movie.id);
+                }}
+                onMouseLeave={() => {
+                  setHover(-1);
+                }}
               >
-                <div className="p-1 text-xl font-bold text-slate-200 bg-slate-900 w-full rounded-b-xl items-end flex justify-center">
+                {hover == movie.id && (
+                  <>
+                    {favs.find((m) => m.id == movie.id) ? (
+                      <div
+                        className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
+                        onClick={() => {
+                          removeFromFavs(movie);
+                        }}
+                      >
+                        ❌
+                      </div>
+                    ) : (
+                      <div
+                        className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
+                        onClick={() => {
+                          addToFavs(movie);
+                        }}
+                      >
+                        ❤️
+                      </div>
+                    )}
+                  </>
+                )}
+
+                <div className="py-2 font-bold text-slate-200 text-center bg-gray-900 w-full rounded-b-xl">
                   {movie.title}
                 </div>
               </div>
@@ -59,6 +117,8 @@ function Movies() {
           </div>
         )}
       </div>
+
+      <Pagination pageProp={page} nextPage={nextPage} prevPage={prevPage} />
     </>
   );
 }

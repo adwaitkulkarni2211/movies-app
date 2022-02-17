@@ -2,7 +2,6 @@ import logo from './logo.svg';
 import './App.css';
 import NavBar from "./components/NavBar"
 import Movies from './components/Movies';
-import Pagination from './components/Pagination';
 import Banner from './components/Banner';
 import Favourites from './components/Favourites';
 import {BrowserRouter, Routes, Route} from 'react-router-dom'
@@ -16,7 +15,7 @@ function App() {
             <NavBar />
             <Banner />
             <Movies />
-            <Pagination />
+            {/* <Pagination /> */}
           </>        
         } />
 
