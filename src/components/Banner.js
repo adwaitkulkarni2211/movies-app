@@ -27,7 +27,7 @@ function Banner() {
           className={`bg-[url(https://image.tmdb.org/t/p/original/${movie.backdrop_path})] h-[40vh] md:h-[60vh] bg-center bg-cover flex items-end`}
         >
           <div className="text-xl md:text-3xl text-slate-50 p-4 bg-gray-900 bg-opacity-70 w-full flex justify-center">
-            {movie.title}
+            {movie.title} ({movie.release_date.slice(0, 4)})
           </div>
         </div>
       </div>

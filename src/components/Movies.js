@@ -52,7 +52,7 @@ function Movies() {
     let clickedMovie = movies.find(m => m.id == movie.id);
     let newMovieClicks = [...movieClicks, clickedMovie];
     setMovieClicks([...newMovieClicks])
-    console.log("in MovieClicks", newMovieClicks);
+    //console.log("in MovieClicks", newMovieClicks);
   }
 
   const hideOverview = (movie) => {
@@ -111,7 +111,8 @@ function Movies() {
                         {favs.find((m) => m.id == movie.id) ? (
                           <div
                             className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation()
                               removeFromFavs(movie);
                             }}
                           >
@@ -120,7 +121,8 @@ function Movies() {
                         ) : (
                           <div
                             className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation()
                               addToFavs(movie);
                             }}
                           >
@@ -131,7 +133,7 @@ function Movies() {
                     )}
 
                     <div className="py-2 font-bold text-slate-200 text-center bg-gray-900 w-full rounded-b-xl">
-                      {movie.title}
+                      {movie.title} ({movie.release_date.slice(0, 4)})
                     </div>
                     </div>
                   } else {
