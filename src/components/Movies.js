@@ -8,6 +8,7 @@ function Movies() {
   const [page, setPage] = useState(1);
   const [hover, setHover] = useState("");
   const [favs, setFavs] = useState([]);
+  const [movieClicks, setMovieClicks] = useState([]);
 
   useEffect(() => {
     axios
@@ -34,23 +35,37 @@ function Movies() {
   };
 
   const addToFavs = (movie) => {
-    console.log("In addToFavs");
+    //console.log("In addToFavs");
     let newFavs = [...favs, movie];
     setFavs([...newFavs]);
-    console.log(newFavs);
+    //console.log(newFavs);
   };
 
   const removeFromFavs = (movie) => {
-    console.log("in removeFromFavs");
+    //console.log("in removeFromFavs");
     let newFavs = favs.filter((m) => m.id !== movie.id);
     setFavs([...newFavs]);
-    console.log(newFavs);
+    //console.log(newFavs);
   };
+
+  const showOverview = (movie) => {
+    let clickedMovie = movies.find(m => m.id == movie.id);
+    let newMovieClicks = [...movieClicks, clickedMovie];
+    setMovieClicks([...newMovieClicks])
+    console.log("in MovieClicks", newMovieClicks);
+  }
+
+  const hideOverview = (movie) => {
+    let newMovieClicks = movieClicks.filter(m => m.id !== movie.id);
+    setMovieClicks([...newMovieClicks]);
+  }
+
+
 
   return (
     <>
       <div className="mb-8">
-        <div className="mt-8 mb-8 font-bold text-2xl text-center">
+        <div className="mt-8 mb-8 font-bold text-sky-400 text-2xl text-center">
           Trending Movies
         </div>
         {movies.length == 0 ? (
@@ -63,58 +78,91 @@ function Movies() {
             />
           </div>
         ) : (
-          <div className="flex flex-wrap justify-center">
-            {movies.map((movie) => (
-              <div
-                className={`
-                  bg-[url(https://image.tmdb.org/t/p/w500${movie.backdrop_path})]
-                  h-[25vh] w-[150px]
-                  md:h-[30vh] md:w-[250px]
-                  bg-center bg-cover
-                  rounded-xl
-                  flex items-end
-                  m-4
-                  hover:scale-110
-                  ease-out duration-300
-                  relative
-                `}
-                onMouseEnter={() => {
-                  setHover(movie.id);
-                }}
-                onMouseLeave={() => {
-                  setHover(-1);
-                }}
-              >
-                {hover == movie.id && (
-                  <>
-                    {favs.find((m) => m.id == movie.id) ? (
-                      <div
-                        className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
-                        onClick={() => {
-                          removeFromFavs(movie);
-                        }}
-                      >
-                        ❌
-                      </div>
-                    ) : (
-                      <div
-                        className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
-                        onClick={() => {
-                          addToFavs(movie);
-                        }}
-                      >
-                        ❤️
-                      </div>
+            <div className="flex flex-wrap justify-center">
+              {
+                movies.map((movie) => {
+                  if(movieClicks.find(m => m.id == movie.id) == undefined) {
+                    return <div
+                    className={`
+                      bg-[url(https://image.tmdb.org/t/p/w500${movie.backdrop_path})]
+                      h-[25vh] w-[150px]
+                      md:h-[30vh] md:w-[350px]
+                      bg-center bg-cover
+                      rounded-xl
+                      shadow-2xl
+                      flex items-end
+                      m-4
+                      hover:scale-110
+                      ease-out duration-300
+                      relative
+                    `}
+                    onMouseEnter={() => {
+                      setHover(movie.id);
+                    }}
+                    onMouseLeave={() => {
+                      setHover(-1);
+                    }}
+                    onClick={() => {
+                      showOverview(movie);
+                    }}
+                  >
+                    {hover == movie.id && (
+                      <>
+                        {favs.find((m) => m.id == movie.id) ? (
+                          <div
+                            className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
+                            onClick={() => {
+                              removeFromFavs(movie);
+                            }}
+                          >
+                            ❌
+                          </div>
+                        ) : (
+                          <div
+                            className="absolute top-2 right-2 p-2 bg-slate-900 rounded text-white text-center cursor-pointer"
+                            onClick={() => {
+                              addToFavs(movie);
+                            }}
+                          >
+                            ❤️
+                          </div>
+                        )}
+                      </>
                     )}
-                  </>
-                )}
 
-                <div className="py-2 font-bold text-slate-200 text-center bg-gray-900 w-full rounded-b-xl">
-                  {movie.title}
-                </div>
-              </div>
-            ))}
-          </div>
+                    <div className="py-2 font-bold text-slate-200 text-center bg-gray-900 w-full rounded-b-xl">
+                      {movie.title}
+                    </div>
+                    </div>
+                  } else {
+                    return <div 
+                    className="
+                      bg-slate-900
+                      h-[25vh] w-[150px]
+                      md:h-[30vh] md:w-[350px]
+                      bg-center bg-cover
+                      rounded-xl
+                      shadow-2xl
+                      flex items-center
+                      m-4
+                      p-2
+                      text-center
+                      text-white
+                      cursor-default
+                      hover:scale-110
+                      ease-out duration-300
+                      relative"
+                    onClick={() => {
+                      hideOverview(movie);
+                    }}  
+                    >
+                        {movie.overview}
+                    </div>
+                  }
+                  
+                })
+              }
+            </div>
         )}
       </div>
 
