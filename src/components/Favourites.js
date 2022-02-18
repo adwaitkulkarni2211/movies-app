@@ -88,6 +88,7 @@ function Favourites() {
   const [order, setOrder] = useState({title: "Movie", status: "inc"});
   const [favs, setFavs] = useState([]);
 
+  //for loading favourites
   useEffect(() => {
     const oldFavs = JSON.parse(localStorage.getItem("favs"));
     setFavs([...oldFavs]);
@@ -192,7 +193,7 @@ function Favourites() {
                   <tr>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default hover:bg-gray-100"
                       onClick={() => {
                         toggleOrder("Movie")
                       }}
@@ -207,7 +208,7 @@ function Favourites() {
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default hover:bg-gray-100"
                       onClick={() => {
                         toggleOrder("Rating")
                       }}
@@ -222,7 +223,7 @@ function Favourites() {
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default hover:bg-gray-100"
                       onClick={() => {
                         toggleOrder("Popularity")
                       }}
@@ -237,13 +238,13 @@ function Favourites() {
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default hover:bg-gray-100"
                     >
                       Genre
                     </th>
                     <th
                       scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default hover:bg-gray-100"
                     >
                       Remove
                     </th>
@@ -273,23 +274,21 @@ function Favourites() {
                       <div className="text-sm text-gray-900">{movie.popularity}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {movie.genre_ids.map((id) => {
-                          let genre = genreIds.genres.find(gid => gid.id == id).name;
-                          console.log(genre);
-                          <div>
-                            {genre} 
-                          </div>
-                        })}
+                        {movie.genre_ids.map((id) => (
+                            <span className="mr-1 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                              {genreIds.genres.find(gid => gid.id == id).name}
+                            </span>                          
+                        ))}
                       </td>
-                      <td 
-                        className="px-10 py-4 whitespace-nowrap text-sm text-gray-500" 
-                      >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <div
                           className='cursor-pointer'
                           onClick={() => {
                             removeFromFavs(movie);
                           }}>
-                          ❌
+                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                              Remove
+                          </span>
                         </div>
                         
                       </td>
