@@ -7,17 +7,20 @@ function Movies() {
   const [movies, setMovies] = useState([]);
   const [page, setPage] = useState(1);
   const [hover, setHover] = useState("");
-  const [favs, setFavs] = useState([]);
   const [movieClicks, setMovieClicks] = useState([]);
+  const [favs, setFavs] = useState([]);
 
   useEffect(() => {
     axios
       .get(
-        `https://api.themoviedb.org/3/trending/movie/day?api_key=97310bb852aa576566d673aa9cfd45bf&page=${page}`
+        `https://api.themoviedb.org/3/trending/movie/week?api_key=97310bb852aa576566d673aa9cfd45bf&page=${page}`
       )
       .then((response) => {
         console.log(response.data.results);
         setMovies(response.data.results);
+        //loading favourites
+        let oldFavs = JSON.parse(localStorage.getItem("favs"))
+        setFavs([...oldFavs])
       })
       .catch((err) => {
         console.log(err);
@@ -38,6 +41,7 @@ function Movies() {
     //console.log("In addToFavs");
     let newFavs = [...favs, movie];
     setFavs([...newFavs]);
+    localStorage.setItem("favs", JSON.stringify(newFavs));
     //console.log(newFavs);
   };
 
@@ -45,6 +49,7 @@ function Movies() {
     //console.log("in removeFromFavs");
     let newFavs = favs.filter((m) => m.id !== movie.id);
     setFavs([...newFavs]);
+    localStorage.setItem("favs", JSON.stringify(newFavs));
     //console.log(newFavs);
   };
 
@@ -59,8 +64,6 @@ function Movies() {
     let newMovieClicks = movieClicks.filter(m => m.id !== movie.id);
     setMovieClicks([...newMovieClicks]);
   }
-
-
 
   return (
     <>
