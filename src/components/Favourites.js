@@ -93,12 +93,14 @@ function Favourites() {
   useEffect(() => {
     const oldFavs = JSON.parse(localStorage.getItem("favs"));
     setFavs([...oldFavs]);
-    console.log("In 1st useEffect");
   }, [])
 
   //for setting genre buttons at the top
   useEffect(() => {
-    let tempGenres = favs.map(movie => {
+    //getting from localStorate in order to display all genres of all favs. 
+    //favs is changed when a genre button is clicked, which will also change genreButtons if we filter from favs.
+    const tempFavs = JSON.parse(localStorage.getItem("favs"));
+    let tempGenres = tempFavs.map(movie => {
       return movie.genre_ids.map(gid => genreIds.genres.find(genre => genre.id == gid).name)
     })
     //converting to 1d array
@@ -106,7 +108,7 @@ function Favourites() {
     //removing duplicates
     tempGenres = [...new Set(tempGenres)];
     //console.log(tempGenres);
-    setGenreButtons([...tempGenres]);
+    setGenreButtons(["All Genres", ...tempGenres]);
   }, [favs])
 
   //for showing movies only of the selected genre
@@ -114,9 +116,7 @@ function Favourites() {
     let tempFavs = JSON.parse(localStorage.getItem("favs"));
     if(currGenre == "All Genres") {
       setFavs([...tempFavs])
-      //console.log("In 3rd useEffect");
     } else {
-      //console.log(favs);
       tempFavs = tempFavs.filter(movie => {
         let movieGenres = movie.genre_ids.map(gid => genreIds.genres.find(genre => genre.id == gid).name)
         for(let i=0; i<movieGenres.length; i++) {
@@ -126,13 +126,10 @@ function Favourites() {
         }
       })
       setFavs([...tempFavs]);
-      // console.log("In 3rd useEffect else");
-      // console.log(tempFavs);
     }
   },[currGenre])
 
   const removeFromFavs = (movie) => {
-    //console.log("in removeFromFavs");
     let newFavs = favs.filter((m) => m.id !== movie.id);
     setFavs([...newFavs]);
     localStorage.setItem("favs", JSON.stringify(newFavs));
@@ -192,18 +189,6 @@ function Favourites() {
     <>
       <NavBar />
       <div className='mt-4 px-2 flex justify-center flex-wrap space-x-2'>
-        <button 
-          className={currGenre == "All Genres"
-            ?`m-2 text-lg p-1 bg-blue-400 hover:bg-blue-400 text-white rounded-xl font-bold`
-            :`m-2 text-lg p-1 bg-gray-400 hover:bg-blue-400 text-white rounded-xl font-bold`
-          }
-          onClick={() => {
-            setCurrGenre("All Genres")
-          }}
-        >
-          All Genres
-        </button>
-
         {genreButtons.map(genre => (
           <button 
             className={currGenre == genre
@@ -217,18 +202,6 @@ function Favourites() {
             {genre}
           </button>
         ))}
-        
-        {/* <button 
-          className={currGenre == "Action" 
-          ?`m-2 text-lg p-1 bg-blue-400 hover:bg-blue-400 text-white rounded-xl font-bold`
-          :`m-2 text-lg p-1 bg-gray-400 hover:bg-blue-400 text-white rounded-xl font-bold`
-        }
-          onClick={() => {
-            setCurrGenre("Action")
-          }}
-        >
-          Action
-        </button> */}
       </div>
 
       <div className='text-center'>
