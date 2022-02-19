@@ -12,7 +12,7 @@ function Banner() {
         "https://api.themoviedb.org/3/trending/movie/day?api_key=97310bb852aa576566d673aa9cfd45bf"
       )
       .then((response) => {
-        console.log(response);
+        //console.log(response);
         setMovie(response.data.results[0]);
       })
       .catch((err) => {

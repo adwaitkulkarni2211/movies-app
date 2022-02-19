@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react'
+import axios from 'axios';
 import NavBar from './NavBar'
 import Pagination from './Pagination'
 
@@ -82,16 +83,19 @@ function Favourites() {
             "name": "Western"
         }
     ]
-};
+  };
 
   const [currGenre, setCurrGenre] = useState('All Genres')
   const [genreButtons, setGenreButtons] = useState([])
-  const [order, setOrder] = useState({title: "Movie", status: "inc"});
+  const [order, setOrder] = useState({title: "", status: ""});
   const [favs, setFavs] = useState([]);
+  const [search, setSearch] = useState("")
+  const [rows, setRows] = useState(5);
+  const [page, setPage] = useState(1);
 
   //for loading favourites
   useEffect(() => {
-    const oldFavs = JSON.parse(localStorage.getItem("favs"));
+    const oldFavs = JSON.parse(localStorage.getItem("favs")) || [];
     setFavs([...oldFavs]);
   }, [])
 
@@ -99,7 +103,7 @@ function Favourites() {
   useEffect(() => {
     //getting from localStorate in order to display all genres of all favs. 
     //favs is changed when a genre button is clicked, which will also change genreButtons if we filter from favs.
-    const tempFavs = JSON.parse(localStorage.getItem("favs"));
+    const tempFavs = JSON.parse(localStorage.getItem("favs")) || [];
     let tempGenres = tempFavs.map(movie => {
       return movie.genre_ids.map(gid => genreIds.genres.find(genre => genre.id == gid).name)
     })
@@ -111,24 +115,6 @@ function Favourites() {
     setGenreButtons(["All Genres", ...tempGenres]);
   }, [favs])
 
-  //for showing movies only of the selected genre
-  useEffect(() => {
-    let tempFavs = JSON.parse(localStorage.getItem("favs"));
-    if(currGenre == "All Genres") {
-      setFavs([...tempFavs])
-    } else {
-      tempFavs = tempFavs.filter(movie => {
-        let movieGenres = movie.genre_ids.map(gid => genreIds.genres.find(genre => genre.id == gid).name)
-        for(let i=0; i<movieGenres.length; i++) {
-          if(currGenre == movieGenres[i]) {
-            return movie;
-          }
-        }
-      })
-      setFavs([...tempFavs]);
-    }
-  },[currGenre])
-
   const removeFromFavs = (movie) => {
     let newFavs = favs.filter((m) => m.id !== movie.id);
     setFavs([...newFavs]);
@@ -136,54 +122,80 @@ function Favourites() {
     //console.log(newFavs);
   };
 
+  let filteredFavs = []
+
+  //displaying movies based on genres
+  filteredFavs = (currGenre == "All Genres" ? favs : favs.filter(movie => {
+    let movieGenres = movie.genre_ids.map(gid => genreIds.genres.find(genre => genre.id == gid).name)
+      for(let i=0; i<movieGenres.length; i++) {
+        if(currGenre == movieGenres[i]) {
+          return movie;
+        }
+      }
+  }))
+  //console.log("filteredFavs GENRE BUTTON: " + filteredFavs.map(movie => movie.title));
+
   const toggleOrder = (title) => {
     if(order.title == title) {
       if(order.status == "inc") {
         setOrder({title: title, status: "dec"})
-        sortBasedOnTitle(title, "dec");
       } else {
         setOrder({title: title, status: "inc"})
-        sortBasedOnTitle(title, "inc");
       }
     } else {
       setOrder({title: title, status: "inc"});
-      sortBasedOnTitle(title, "inc");
     }
   }
 
-  const sortBasedOnTitle = (title, status) => {
-    if(title == "Movie") { 
-      if(status == "inc") {
-        let newFavs = [...favs];
-        newFavs.sort((a, b) => (a.original_title > b.original_title) ? 1 : -1);
-        setFavs([...newFavs]);
-      } else {
-        let newFavs = [...favs];
-        newFavs.sort((a, b) => (a.original_title > b.original_title) ? -1 : 1);
-        setFavs([...newFavs]);
-      }
-    } else if(title == "Popularity") {
-      if(status == "inc") {
-        let newFavs = [...favs];
-        newFavs.sort((a, b) => (a.popularity > b.popularity) ? 1 : -1);
-        setFavs([...newFavs]);
-      } else {
-        let newFavs = [...favs];
-        newFavs.sort((a, b) => (a.popularity > b.popularity) ? -1 : 1);
-        setFavs([...newFavs]);
-      }
-    } else if(title == "Rating") {
-      if(status == "inc") {
-        let newFavs = [...favs];
-        newFavs.sort((a, b) => (a.vote_average > b.vote_average) ? 1 : -1);
-        setFavs([...newFavs]);
-      } else {
-        let newFavs = [...favs];
-        newFavs.sort((a, b) => (a.vote_average > b.vote_average) ? -1 : 1);
-        setFavs([...newFavs]);
-      }
+  if(order.title == "Movie") { 
+    if(order.status == "inc") {
+      filteredFavs.sort((a, b) => (a.original_title > b.original_title) ? 1 : -1);
+      //console.log(filteredFavs.map(movie => movie.title));
+    } else {
+      filteredFavs.sort((a, b) => (a.original_title > b.original_title) ? -1 : 1);
+      //console.log(filteredFavs.map(movie => movie.title));
+    }
+  } else if(order.title == "Popularity") {
+    if(order.status == "inc") {
+      filteredFavs.sort((a, b) => (a.popularity > b.popularity) ? 1 : -1);
+    } else {
+      filteredFavs.sort((a, b) => (a.popularity > b.popularity) ? -1 : 1);
+    }
+  } else if(order.title == "Rating") {
+    if(order.status == "inc") {
+      filteredFavs.sort((a, b) => (a.vote_average > b.vote_average) ? 1 : -1);
+    } else {
+      filteredFavs.sort((a, b) => (a.vote_average > b.vote_average) ? -1 : 1);
     }
   }
+  //console.log("filteredFavs SORT: " + filteredFavs.map(movie => movie.title));
+
+  //search
+  filteredFavs = filteredFavs.filter(movie => movie.title.toLowerCase().includes(search.toLowerCase()));
+  //console.log("filteredFavs SEARCH: " + filteredFavs.map(movie => movie.title));
+
+  //displaying only entered number of rows
+  let maxPages = Math.ceil(filteredFavs.length / rows)
+  //console.log("Max pages: " + maxPages);
+  let startIdx = (page * rows) - rows;
+  let endIdx = Number(startIdx) + Number(rows);
+  //console.log("si: " + startIdx + " ei: " + endIdx);
+  filteredFavs = filteredFavs.slice(startIdx, endIdx);
+  //console.log("filteredFavs ROWS: " + filteredFavs.map(movie => movie.title));
+
+  //pagination
+  const nextPage = () => {
+    if(page < maxPages)
+      setPage(page + 1);
+  };
+
+  const prevPage = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
+  //console.log("filteredFavs FINAL: " + filteredFavs.map(movie => movie.title));
 
   return (
     <>
@@ -197,6 +209,7 @@ function Favourites() {
             }
             onClick={() => {
               setCurrGenre(genre)
+              setPage(1)
             }}
           >
             {genre}
@@ -205,8 +218,22 @@ function Favourites() {
       </div>
 
       <div className='text-center'>
-        <input type="text" className="border boder-3 p-1 m-2" placeholder='search'/>
-        <input type="number" className="border boder-3 p-1 m-2" placeholder='rows'/>
+        <input 
+          type="text" 
+          className="border boder-3 p-1 m-2" 
+          placeholder='search' 
+          value={search} 
+          onChange={(e) => {
+            setSearch(e.target.value);
+          }}/>
+        <input 
+          type="number" 
+          className="border boder-3 p-1 m-2" 
+          placeholder='rows'
+          value={rows}
+          onChange={(e) => {
+            setRows(e.target.value);
+          }} />
       </div>
 
       <div className="flex flex-col m-4">
@@ -220,7 +247,7 @@ function Favourites() {
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-default hover:bg-gray-100"
                       onClick={() => {
-                        toggleOrder("Movie")
+                         toggleOrder("Movie")
                       }}
                     >
                       {order.title !== "Movie" 
@@ -277,7 +304,7 @@ function Favourites() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {favs.map((movie) => (
+                  {filteredFavs.map((movie) => (
                     <tr>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
@@ -325,7 +352,7 @@ function Favourites() {
       </div>
 
       <div className='m-4'>
-        <Pagination />
+        <Pagination pageProp={page} nextPage={nextPage} prevPage={prevPage}/>
       </div>
     </>
   )

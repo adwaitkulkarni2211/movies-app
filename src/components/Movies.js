@@ -16,10 +16,10 @@ function Movies() {
         `https://api.themoviedb.org/3/trending/movie/week?api_key=97310bb852aa576566d673aa9cfd45bf&page=${page}`
       )
       .then((response) => {
-        console.log(response.data.results);
+        //console.log(response.data.results);
         setMovies(response.data.results);
         //loading favourites
-        let oldFavs = JSON.parse(localStorage.getItem("favs"))
+        let oldFavs = JSON.parse(localStorage.getItem("favs")) || []
         setFavs([...oldFavs])
       })
       .catch((err) => {
