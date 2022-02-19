@@ -84,7 +84,8 @@ function Favourites() {
     ]
 };
 
-  const [genre, setGenre] = useState('All Genres')
+  const [currGenre, setCurrGenre] = useState('All Genres')
+  const [genreButtons, setGenreButtons] = useState([])
   const [order, setOrder] = useState({title: "Movie", status: "inc"});
   const [favs, setFavs] = useState([]);
 
@@ -92,7 +93,43 @@ function Favourites() {
   useEffect(() => {
     const oldFavs = JSON.parse(localStorage.getItem("favs"));
     setFavs([...oldFavs]);
+    console.log("In 1st useEffect");
   }, [])
+
+  //for setting genre buttons at the top
+  useEffect(() => {
+    let tempGenres = favs.map(movie => {
+      return movie.genre_ids.map(gid => genreIds.genres.find(genre => genre.id == gid).name)
+    })
+    //converting to 1d array
+    tempGenres = [].concat(...tempGenres);
+    //removing duplicates
+    tempGenres = [...new Set(tempGenres)];
+    //console.log(tempGenres);
+    setGenreButtons([...tempGenres]);
+  }, [favs])
+
+  //for showing movies only of the selected genre
+  useEffect(() => {
+    let tempFavs = JSON.parse(localStorage.getItem("favs"));
+    if(currGenre == "All Genres") {
+      setFavs([...tempFavs])
+      //console.log("In 3rd useEffect");
+    } else {
+      //console.log(favs);
+      tempFavs = tempFavs.filter(movie => {
+        let movieGenres = movie.genre_ids.map(gid => genreIds.genres.find(genre => genre.id == gid).name)
+        for(let i=0; i<movieGenres.length; i++) {
+          if(currGenre == movieGenres[i]) {
+            return movie;
+          }
+        }
+      })
+      setFavs([...tempFavs]);
+      // console.log("In 3rd useEffect else");
+      // console.log(tempFavs);
+    }
+  },[currGenre])
 
   const removeFromFavs = (movie) => {
     //console.log("in removeFromFavs");
@@ -156,27 +193,42 @@ function Favourites() {
       <NavBar />
       <div className='mt-4 px-2 flex justify-center flex-wrap space-x-2'>
         <button 
-          className={genre == "All Genres" 
+          className={currGenre == "All Genres"
             ?`m-2 text-lg p-1 bg-blue-400 hover:bg-blue-400 text-white rounded-xl font-bold`
             :`m-2 text-lg p-1 bg-gray-400 hover:bg-blue-400 text-white rounded-xl font-bold`
           }
           onClick={() => {
-            setGenre("All Genres")
+            setCurrGenre("All Genres")
           }}
         >
           All Genres
         </button>
-        <button 
-          className={genre == "Action" 
+
+        {genreButtons.map(genre => (
+          <button 
+            className={currGenre == genre
+              ?`m-2 text-lg p-1 bg-blue-400 hover:bg-blue-400 text-white rounded-xl font-bold`
+              :`m-2 text-lg p-1 bg-gray-400 hover:bg-blue-400 text-white rounded-xl font-bold`
+            }
+            onClick={() => {
+              setCurrGenre(genre)
+            }}
+          >
+            {genre}
+          </button>
+        ))}
+        
+        {/* <button 
+          className={currGenre == "Action" 
           ?`m-2 text-lg p-1 bg-blue-400 hover:bg-blue-400 text-white rounded-xl font-bold`
           :`m-2 text-lg p-1 bg-gray-400 hover:bg-blue-400 text-white rounded-xl font-bold`
         }
           onClick={() => {
-            setGenre("Action")
+            setCurrGenre("Action")
           }}
         >
           Action
-        </button>
+        </button> */}
       </div>
 
       <div className='text-center'>
@@ -281,16 +333,14 @@ function Favourites() {
                         ))}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <div
-                          className='cursor-pointer'
+                        <span 
+                          className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800 cursor-pointer"
                           onClick={() => {
                             removeFromFavs(movie);
-                          }}>
-                          <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                              Remove
-                          </span>
-                        </div>
-                        
+                          }}
+                        >                          
+                          Remove
+                        </span>                        
                       </td>
                     </tr>
                   ))}
