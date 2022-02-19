@@ -148,11 +148,11 @@ function Movies() {
                       bg-center bg-cover
                       rounded-xl
                       shadow-2xl
-                      flex items-center
                       m-4
                       p-2
                       text-center
                       text-white
+                      text-ellipsis overflow-hidden ...
                       cursor-default
                       hover:scale-110
                       ease-out duration-300
@@ -161,7 +161,10 @@ function Movies() {
                       hideOverview(movie);
                     }}  
                     >
+                      <div className="my-2">
                         {movie.overview}
+                      </div>
+                        
                     </div>
                   }
                   
