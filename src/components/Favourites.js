@@ -313,7 +313,14 @@ function Favourites() {
                               src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`} alt="" />
                           </div>
                           <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">{movie.original_title}</div>
+                            <div className="text-sm font-medium text-gray-900">
+                              <a 
+                                className='hover:underline' 
+                                href={`https://www.themoviedb.org/movie/${movie.id}`}
+                                target="_blank">
+                                {movie.original_title}
+                              </a> 
+                            </div>
                             <div className="text-sm text-gray-500">{movie.release_date.slice(0, 4)}</div>
                           </div>
                         </div>

@@ -136,7 +136,16 @@ function Movies() {
                     )}
 
                     <div className="py-2 font-bold text-slate-200 text-center bg-gray-900 w-full rounded-b-xl">
-                      {movie.title} ({movie.release_date.slice(0, 4)})
+                      <a 
+                        className='hover:underline' 
+                        href={`https://www.themoviedb.org/movie/${movie.id}`}
+                        target="_blank"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                        }}>
+                        {movie.title} ({movie.release_date.slice(0, 4)})
+                      </a>
+                      
                     </div>
                     </div>
                   } else {
