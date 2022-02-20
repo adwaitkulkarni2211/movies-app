@@ -14,6 +14,5 @@ __Movies Page:__ <br />
     The table will display the number of rows entered, rest of the rows will be shifted to the next page.<br />
     Clicking on the title will open the TMDB page for the movie in a new tab for more information.<br />
 
-
-
-    
+###### Link:
+https://lucid-newton-e01751.netlify.app/
